@@ -207,6 +207,7 @@ class Constraints(object):
         self.min_lattice_angle = self.default_min_lattice_angle
         self.max_lattice_angle = self.default_max_lattice_angle
         self.allow_endpoints = self.default_allow_endpoints
+        self.max_interface_atoms = self.default_max_interface_atoms
         self.set_all_mids_to_defaults(composition_space)
 
     def set_all_mids_to_defaults(self, composition_space):
