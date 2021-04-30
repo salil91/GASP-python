@@ -276,34 +276,34 @@ def make_objects(parameters):
     if 'JobSpecs' in parameters:
         job_specs = parameters['JobSpecs']
 
-    if 'cores' in job_specs:
-        if job_specs['cores'] > 8:
-            print ('Using max. default cpus_per_task: 8')
-            job_specs['cores'] = 8
-    else:
-        # default cpus_per_task for a worker
-        job_specs['cores'] = 1
+        if 'cores' in job_specs:
+            if job_specs['cores'] > 8:
+                print ('Using max. default cpus_per_task: 8')
+                job_specs['cores'] = 8
+        else:
+            # default cpus_per_task for a worker
+            job_specs['cores'] = 1
 
-    if not 'walltime' in job_specs:
-        print ('Using default wall time of 24:00:00')
-        job_specs['walltime'] = '24:00:00'
+        if not 'walltime' in job_specs:
+            print ('Using default wall time of 24:00:00')
+            job_specs['walltime'] = '24:00:00'
 
-    if 'memory' not in job_specs:
-        # default job memory for a worker
-        print ('Using default total memory of 8GB per worker')
-        job_specs['memory'] = '8GB'
+        if 'memory' not in job_specs:
+            # default job memory for a worker
+            print ('Using default total memory of 8GB per worker')
+            job_specs['memory'] = '8GB'
 
-    if not 'project' in job_specs:
-        print ('Please specify the project "#SBATCH -A" tag for worker.')
-        quit()
+        if not 'project' in job_specs:
+            print ('Please specify the project "#SBATCH -A" tag for worker.')
+            quit()
 
-    if not 'queue' in job_specs:
-        print ('Specify queue option in job_specs if the SLURM/PBS cluster'
-                        ' requires it. Otherwise ignore..')
+        if not 'queue' in job_specs:
+            print ('Specify queue option in job_specs if the SLURM/PBS cluster'
+                            ' requires it. Otherwise ignore..')
 
-    if not 'interface' in job_specs:
-        print ('Using default interface \'ib0\' (infiniband nodes)')
-        job_specs['interface'] = 'ib0'
+        if not 'interface' in job_specs:
+            print ('Using default interface \'ib0\' (infiniband nodes)')
+            job_specs['interface'] = 'ib0'
 
     objects_dict['job_specs'] = job_specs
 
