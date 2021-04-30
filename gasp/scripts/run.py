@@ -40,7 +40,7 @@ def main():
 
     try:
         with open(input_file, 'r') as f:
-            parameters = yaml.load(f)
+            parameters = yaml.load(f, Loader=yaml.FullLoader)
     except:
         print('Error reading input file.')
         print('Quitting...')
