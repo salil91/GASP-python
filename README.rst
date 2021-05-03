@@ -111,7 +111,7 @@ Move into the 'GASP-python' directory and install using pip::
     cd GASP-python
     pip install .
 
-If you plan to frequently edit the code, use the -e tag while installing GASP, to prevent having to re-install the package every time.
+If you plan to frequently edit the code, use the -e tag while installing GASP, to prevent having to re-install the package every time::
 
     pip install -e .
 
