@@ -52,6 +52,7 @@ geometry = objects_dict['geometry']
 # Everythin will be used explicitly as kwargs for energy_calculator
 E_sub_prim, n_sub_prim, mu_A, mu_B, mu_C = None, None, None, None, None
 lat_match_dict = None
+max_area = None
 substrate_search = False
 substrate_params = {}
 if geometry.shape == 'interface':
@@ -68,11 +69,13 @@ if substrate_search:
             quit()
     lat_match_dict = match_constraints
     lat_match_dict.update(substrate_params)
+    max_area = match_constraints['max_area']
     # Parse the primitve substrate structure from input argument
-    sub_cell = general.Cell.from_file('POSCAR_sub')
-    # make it conventional_standard_structure using pymatgen to avoid issues
-    spgr_obj = SpacegroupAnalyzer(sub_cell)
-    substrate_prim = spgr_obj.get_refined_structure()
+    substrate_prim = general.Cell.from_file('POSCAR_sub')
+    # check if substrate has sd_flags ; if no flags, set all to be F F F
+    if not 'selective_dynamics' in substrate_prim.site_properties.keys():
+        for site in substrate_prim.sites:
+            site.properties['selective_dynamics'] = [False, False, False]
 
 # get the objects from the dictionary for convenience
 run_dir_name = objects_dict['run_dir_name']
@@ -80,6 +83,7 @@ organism_creators = objects_dict['organism_creators']
 num_calcs_at_once = objects_dict['num_calcs_at_once']
 composition_space = objects_dict['composition_space']
 constraints = objects_dict['constraints']
+constraints.max_area = max_area   # set max_area from match_constraints
 developer = objects_dict['developer']
 redundancy_guard = objects_dict['redundancy_guard']
 stopping_criteria = objects_dict['stopping_criteria']
@@ -171,8 +175,7 @@ for creator in organism_creators:
                         geometry.pad(new_organism.cell)
                         if substrate_search:
                             # lattice match substrate
-                            new_organism.cell, new_organism.n_sub, \
-                                        new_organism.sd_index = \
+                            new_organism.cell, new_organism.n_sub = \
                                         interface.run_lat_match(
                                         substrate_prim, new_organism.cell,
                                         match_constraints)
@@ -182,7 +185,15 @@ for creator in organism_creators:
                                 del whole_pop[-1]
                                 continue
                             else:
+                                # get sd_flags before padding
+                                sd_props = new_organism.cell.site_properties[
+                                                    'selective_dynamics']
                                 geometry.pad(new_organism.cell)
+                                # re-assign sd_flags to padded cell
+                                for site, prop in zip(new_organism.cell.sites,
+                                                        sd_props):
+                                    site.properties['selective_dynamics'] = \
+                                                        prop
                             if not developer.post_lma_develop(new_organism,
                              composition_space, constraints, geometry, pool):
                                 # remove the organism from whole_pop
@@ -274,16 +285,22 @@ while not stopping_criteria.are_satisfied:
         geometry.pad(unrelaxed_offspring.cell)
 
         if substrate_search:
-            geometry.pad(unrelaxed_offspring.cell)
-            unrelaxed_offspring.cell, unrelaxed_offspring.n_sub, \
-            unrelaxed_offspring.sd_index = interface.run_lat_match(
+            unrelaxed_offspring.cell, unrelaxed_offspring.n_sub = \
+                    interface.run_lat_match(
                     substrate_prim, unrelaxed_offspring.cell, match_constraints)
             kwargs = substrate_params
             if unrelaxed_offspring.cell is None:
                 del whole_pop[-1]
                 continue
             else:
+                # get sd_flags before padding
+                sd_props = unrelaxed_offspring.cell.site_properties[
+                                    'selective_dynamics']
                 geometry.pad(unrelaxed_offspring.cell)
+                # re-assign sd_flags to padded cell
+                for site, prop in zip(unrelaxed_offspring.cell.sites, sd_props):
+                    site.properties['selective_dynamics'] = prop
+
             if not developer.post_lma_develop(unrelaxed_offspring, composition_space,
                                                 constraints, geometry, pool):
                 # remove the organism from whole_pop
@@ -436,25 +453,25 @@ while len(futures) > 0:
                         print ('GASP search finished. Quitting..')
 
 def update_futures(all_futures):
-"""
-Returns list of active futures and relaxed futures that are to be processed
+    """
+    Returns list of active futures and relaxed futures that are to be processed
 
-Args:
-futures - (list) list of futures objects (concurrent_futures)
-"""
-# remove all futures with an exception
-rem_inds, relaxed_inds = [], []
-for i, future in enumerate(all_futures):
-    if future.done():
-        rem_inds.append(i)
-        if not future.exception():
-            relaxed_inds.append(i)
-        else:
-            print (future.exception())
+    Args:
+    futures - (list) list of futures objects (concurrent_futures)
+    """
+    # remove all futures with an exception
+    rem_inds, relaxed_inds = [], []
+    for i, future in enumerate(all_futures):
+        if future.done():
+            rem_inds.append(i)
+            if not future.exception():
+                relaxed_inds.append(i)
+            else:
+                print (future.exception())
 
-# relaxed futures that are to be processed
-relaxed_futures = [all_futures[i] for i in relaxed_inds]
-# futures that are still running
-active_futures = [all_futures[i] for i in range(len(all_futures)) if i not in rem_inds]
+    # relaxed futures that are to be processed
+    relaxed_futures = [all_futures[i] for i in relaxed_inds]
+    # futures that are still running
+    active_futures = [all_futures[i] for i in range(len(all_futures)) if i not in rem_inds]
 
-return active_futures, relaxed_futures
+    return active_futures, relaxed_futures

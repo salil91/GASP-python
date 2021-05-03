@@ -34,7 +34,7 @@
 
        * [Substrate](#substrate)
 
-       * [job_specs](#job_specs)
+       * [JobSpecs](#jobspecs)
 
        * [StoppingCriteria](#stoppingcriteria)
 
@@ -210,8 +210,10 @@ The **num_submits_to_converge** keyword specifies the number of VASP calculation
 
 The **num_rerelax** keyword specifies the number of times to submit a VASP calculation to re-relax an organism. Note that this parameter submits for re-relaxation whether or not a previous calculation is converged. This is optional, default is 0. The VASP output files are indexed from num_submits_to_converge till num_rerelax in job directory.
 
+Note that in some cases like bulk alloys, the search benefits by re-relaxing a converged structure (CONTCAR). So, we use different parameters to specify the number of resubmits to converge and number of times to re-relax a converged structure.
+
 ~~~
-To simply relax all structures n times irrespective of convergence, use
+The following example shows the inputs to simply relax n times irrespective of convergence.
 
 num_submits_to_converge: 0 # does nothing
 num_rerelax: n # submits n relaxations
@@ -495,7 +497,7 @@ Specifies the distance (as fraction of atomic radius) below which to merge atoms
 
    * **halve_offspring_prob**
 
-Only allies to the [interface geometry](#iface_geometry)) Specifies the probability to halve the offspring cell made by mating. This is introduced to explore small area structures as the search often progresses towards large area structures. (large area results in more surface relaxation and more fit organisms). Optional, defaults to 0.25.
+Only applies to the [interface geometry](#iface_geometry)) Specifies the probability to halve the offspring cell made by mating. The area of the offspring cell has to be greater than half of the max_area in [LatticeMatch](#latticematch). This is introduced to explore small area structures as the search often progresses towards large area structures. (large area results in more surface relaxation and more fit organisms). Optional, defaults to 0.25.
 
 [Go back to Contents](#contents)
 
@@ -886,7 +888,6 @@ LatticeMatch:
     align_random: True
     nlayers_substrate: <integer>
     nlayers_2d: <integer>
-    sd_layers: <integer>
 ~~~~
 
 (Only for [interface geometry](#iface_geometry)) The **LatticeMatch** keyword specifies the constraints to use for the lattice matching algorithm. These parameters control the possibility of finding a lattice matched substrate, the size of interface structures, alignment of 2D film on interface and relaxation of interface structures. All parameters are optional, however, it is recommended to note the parameters used to understand and analyze search results.
@@ -905,7 +906,7 @@ Specifies the maximum angle difference between the angle between lattice vectors
 
    * **r1r2_tol**
 
-Specifies the tolerance between the ratio of areas of the primitive slabs of film and substrate. Default is 0.06.
+Specifies the tolerance for the mismatch of the areas of substrate and 2D film with respect to **max_area** <br>i.e., (r1A1 - r2A2)/max_area &lt;= **r1r2_tol** <br>Here r1 and r2 are the supercell sizes of the substrate and the 2D film.
 
    * **separation**
 
@@ -925,11 +926,15 @@ Specifies the number of unique layers of 2D film to consider when aligning the 2
 <br>
 The algorithm returns interface with one of the all possible translations of 2D film on substrate by aligning the unique sites in the **nlayers_substrate** and **nlayers_2d**
 
-   * **sd_layers**
-
-Specifies the number of substrate layers to relax in the interface structure (Specifies the selective dynamics flags for VASP). Default is 1.
-
 Below is an example **LatticeMatch** block containing the default values of the parameters.
+
+~~~~
+Note: For searches with VASP for interface geometry, the selective dynamics
+      flags mentioned in the input POSCAR_sub will be reciprocated throughout
+      all the organisms, and all the 2D film atoms would be set to True. If
+      selective dynamics are not provided in the input file, all substrate
+      atoms are frozen by default.
+~~~~
 
 ~~~~
 LatticeMatch:
@@ -941,7 +946,6 @@ LatticeMatch:
     align_random: True
     nlayers_substrate: 1
     nlayers_2d: 1
-    sd_layers: 1
 ~~~~
 
 
@@ -963,10 +967,15 @@ Substrate:
 ~~~~
 
 (Only for [interface geometry](#iface_geometry)) The **Substrate** keyword specifies the required values to calculate objective function. It includes the energetics of primitive substrate calculation, chemical potentials of each species in the 2D film.
-
+~~~
+The pre-requisite substrate calculation should be performed with -
+1. A primitive cell of the slab structure
+2. Use the relaxed structure (CONTCAR) as the input (POSCAR_sub)
+3. Provide the total energy and number of atoms in the cell as parameters
+~~~
    * **E_sub_prim**
 
-Specifies the total energy of the primitive substrate slab calculation. Use the same **sd_layers** while relaxing the primitive substrate. This parameter is mandatory for interface geometry.
+Specifies the total energy of the primitive substrate slab calculation. Use the relaxed structure from this calculation as the substrate structure (POSCAR_sub). This parameter is mandatory for interface geometry.
 
    * **n_sub_prim**
 
@@ -977,7 +986,8 @@ Specifies the number of atoms in primitive substrate slab. This parameter is man
 Specifies the reference chemical potential of species A. This parameter is mandatory for interface geometry.
 
 ~~~~
-Note: Choose species A, B and C in the increasing order of their electronegativities. That is χ_A < χ_B < χ_C
+Note: Choose species A, B and C in the increasing order of their
+      electronegativities. That is χ_A < χ_B < χ_C
 ~~~~
 
    * **mu_B**
@@ -995,10 +1005,10 @@ Specifies the reference chemical potential of species A. If there are **three** 
 <br>
 
 
-#### <a id='job_specs'></a>job_specs
+#### <a id='jobspecs'></a>JobSpecs
 
 ~~~~
-job_specs:
+JobSpecs:
     cores: <int>
     memory: <string>
     project: <string>
@@ -1011,7 +1021,7 @@ job_specs:
         -
 ~~~~
 
-The **job_specs** keyword specifies the details of the cluster (SLURM/PBS) job that runs each organism calculation (VASP/LAMMPS). **NumCalcsAtOnce** worker jobs, each with the job specifications mentioned here will run in parallel.
+The **JobSpecs** keyword specifies the details of the cluster (SLURM/PBS) job that runs each organism calculation (VASP/LAMMPS). **NumCalcsAtOnce** worker jobs, each with the job specifications mentioned here will run in parallel.
 
    * **cores**
 
@@ -1041,10 +1051,10 @@ Specifies the type of node (infiniband, haswell etc). Default is 'ib0'
 
 Specify any extra options for the job script each mentioned as a separate item in string format. (Ex: '--ntasks=4')
 
-Below is an example **job_specs** block containing the default values of the parameters.
+Below is an example **JobSpecs** block containing the default values of the parameters.
 
 ~~~~
-job_specs:
+JobSpecs:
     cores: 1
     memory: '8GB'
     project: <mandatory>

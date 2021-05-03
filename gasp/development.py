@@ -188,6 +188,7 @@ class Constraints(object):
 
         # check that min and max numbers of atoms makes sense
         self.check_num_atoms_range(composition_space)
+        self.max_area = None
 
     def set_all_to_defaults(self, composition_space):
         '''
@@ -206,6 +207,7 @@ class Constraints(object):
         self.min_lattice_angle = self.default_min_lattice_angle
         self.max_lattice_angle = self.default_max_lattice_angle
         self.allow_endpoints = self.default_allow_endpoints
+        self.max_interface_atoms = self.default_max_interface_atoms
         self.set_all_mids_to_defaults(composition_space)
 
     def set_all_mids_to_defaults(self, composition_space):
@@ -359,10 +361,19 @@ class Developer(object):
 
             pool: the Pool
         '''
+        if not organism:
+            return None
+        # for relaxed organisms in interface goemetry
+        relaxed_iface = False
+        if organism.n_sub:
+            relaxed_iface = True
+            if not self.post_lma_develop(organism, composition_space,
+                                            constraints, geometry, pool):
+                return False
 
         # check the constraints on the number of atoms
-        if not self.satisfies_num_atoms_constraints(organism, geometry,
-                                                    constraints):
+        if not relaxed_iface and not self.satisfies_num_atoms_constraints(
+                                            organism, geometry, constraints):
             return False
 
         # check if the organism is is the composition space
@@ -383,8 +394,8 @@ class Developer(object):
                 return False
 
         # check the lattice length and angle constraints
-        if not self.satisfies_lattice_constraints(organism, geometry,
-                                                            constraints):
+        if not relaxed_iface and not self.satisfies_lattice_constraints(
+                                            organism, geometry, constraints):
             return False
 
         # check the per-species minimum interatomic distance constraints

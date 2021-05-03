@@ -267,8 +267,6 @@ def print_parameters(objects_dict, lat_match_dict=None):
                                   str(lat_match_dict['nlayers_substrate']) + '\n')
             parameters_file.write('    nlayers_2d: ' +
                                   str(lat_match_dict['nlayers_2d']) + '\n')
-            parameters_file.write('    sd_layers: ' +
-                                  str(lat_match_dict['sd_layers']) + '\n')
             parameters_file.write('\n')
 
             # write user-provided substrate calculation details
@@ -330,17 +328,18 @@ def print_parameters(objects_dict, lat_match_dict=None):
         parameters_file.write('\n')
 
         # write the job_specs of the dask-worker including defaults (if any)
-        parameters_file.write('job_specs: \n')
-        parameters_file.write('    cores: ' + str(job_specs['cores']) + '\n')
-        parameters_file.write('    memory: ' + job_specs['memory'] + '\n')
-        parameters_file.write('    project: ' + job_specs['project'] + '\n')
-        parameters_file.write('    queue: ' + job_specs['queue'] + '\n')
-        parameters_file.write('    walltime: ' + job_specs['walltime'] + '\n')
-        parameters_file.write('    interface: ' + job_specs['interface'] + '\n')
-        if 'job_extra' in job_specs:
-            parameters_file.write('    job_extra: \n')
-            for i in range(len(job_specs['job_extra'])):
-                parameters_file.write('        - %r \n' % str(
-                                            job_specs['job_extra'][i]))
+        if job_specs:
+            parameters_file.write('job_specs: \n')
+            parameters_file.write('    cores: ' + str(job_specs['cores']) + '\n')
+            parameters_file.write('    memory: ' + job_specs['memory'] + '\n')
+            parameters_file.write('    project: ' + job_specs['project'] + '\n')
+            parameters_file.write('    queue: ' + job_specs['queue'] + '\n')
+            parameters_file.write('    walltime: ' + job_specs['walltime'] + '\n')
+            parameters_file.write('    interface: ' + job_specs['interface'] + '\n')
+            if 'job_extra' in job_specs:
+                parameters_file.write('    job_extra: \n')
+                for i in range(len(job_specs['job_extra'])):
+                    parameters_file.write('        - %r \n' % str(
+                                                job_specs['job_extra'][i]))
 
         parameters_file.write('\n')
