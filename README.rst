@@ -17,15 +17,15 @@ If pymatgen is already installed, steps 1-3 may be skipped.
 1. Install conda
 ----------------
 
-Many computing clusters have Anaconda installed which shall be loaded as -
+Many computing clusters have Anaconda installed which shall be loaded as::
 
     module load conda
 
-or in some clusters it is
+or in some clusters it is::
 
     module load python
 
-Check if conda is loaded by
+Check if conda is loaded by::
 
     conda info --envs
 
@@ -78,7 +78,8 @@ pymatgen requires using the gcc compiler. To do so, type::
     export CC=gcc
 
 Install pymatgen, which also installs other required dependencies - numpy, scipy, matplotlib
-Note: The latest versions of pymatgen break parts of the GASP code. Until this is fixed, pin pymatgen to v2020::
+
+*Note: The latest versions of pymatgen break parts of the GASP code. Until this is fixed, pin pymatgen to v2020*::
 
     conda install -c conda-forge pymatgen=2020
 
