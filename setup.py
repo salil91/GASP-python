@@ -20,7 +20,7 @@ if __name__ == "__main__":
         packages=find_packages(),
         package_data={},
         zip_safe=False,
-        install_requires=['pymatgen>=4.5.2'],
+        install_requires=['pymatgen<=2020.12.31'],
         classifiers=['Programming Language :: Python :: 2.7',
                      "Programming Language :: Python :: 3",
                      "Programming Language :: Python :: 3.7",
