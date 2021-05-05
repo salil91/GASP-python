@@ -10,7 +10,7 @@ module_dir = os.path.dirname(os.path.abspath(__file__))
 if __name__ == "__main__":
     setup(
         name='GASP',
-        version='2.0',
+        version='1.0',
         description='Genetic algorithm for structure and phase prediction',
         long_description=open(os.path.join(module_dir, 'README.rst')).read(),
         url='https://github.com/salil91/GASP-python',
@@ -34,5 +34,5 @@ if __name__ == "__main__":
         scripts=glob.glob(os.path.join(module_dir, "gasp", "scripts", "*")),
         entry_points={
             'console_scripts': ['run_gasp = gasp.scripts.run:main']
-        }   
+        }
     )
