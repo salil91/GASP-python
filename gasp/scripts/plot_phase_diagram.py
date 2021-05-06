@@ -14,5 +14,9 @@ from gasp.post_processing.plotter import Plotter
 
 import sys
 
-plotter = Plotter(sys.argv[1])
-plotter.plot_phase_diagram()
+def main():
+    plotter = Plotter(sys.argv[1])
+    plotter.plot_phase_diagram()
+
+if __name__ == "__main__":
+    main()

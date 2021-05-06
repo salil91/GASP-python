@@ -33,6 +33,13 @@ if __name__ == "__main__":
         tests_require=['nose'],
         scripts=glob.glob(os.path.join(module_dir, "gasp", "scripts", "*")),
         entry_points={
-            'console_scripts': ['run_gasp = gasp.scripts.run:main']
+            'console_scripts': [
+            'gasp_legacy = gasp.scripts.run:main',
+            'gasp_run = gasp.scripts.dask_run:main',
+            'gasp_plot_progress = gasp.scripts.plot_progress:main',
+            'gasp_plot_phase_diagram = gasp.scripts.plot_phase_diagram:main',
+            'gasp_plot_system_size = gasp.scripts.plot_system_size:main',
+            'gasp_hardness = gasp.scripts.intrinsic_hardness:main'
+            ]
         }
     )

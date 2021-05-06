@@ -14,5 +14,9 @@ from gasp.post_processing.plotter import Plotter
 
 import sys
 
-plotter = Plotter(sys.argv[1])
-plotter.plot_system_size()
+def main():
+    plotter = Plotter(sys.argv[1])
+    plotter.plot_system_size()
+
+if __name__ == "__main__":
+    main()
