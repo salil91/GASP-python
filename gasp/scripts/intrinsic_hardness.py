@@ -79,7 +79,7 @@ def main():
                           "EN_1": electronegativities.get_EN(atom.specie.Z, CN1),
                           "site_2": neighbor['site_index'], "atom_2": neighbor['site'].specie,
                           "Z_2": neighbor['site'].specie.Z, "CN_2": CN2,
-                          "EN_2": electronegativities.get_EN(neighbor['site'].specie.Z, CN2],
+                          "EN_2": electronegativities.get_EN(neighbor['site'].specie.Z, CN2),
                           "bond_length": bl})
         N = len(bonds)
 
