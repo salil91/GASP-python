@@ -1126,7 +1126,7 @@ Also in this directory are files named 'ga_parameters' and 'run_data'. The 'ga_p
 The 'run_data' file contains information about the organisms seen by the algorithm during the search. After each organism is added to the population, the 'run_data' file is appended with a line of the form:
 
 ```
-org_id    composition    total_energy    epa    num_calcs    best_value
+id    composition    total_energy    epa    num_calcs    best_value
 ```
 
 where 'org_id' is the organism ID, 'composition' is the organism's chemical formula, 'total_energy' is the organism's energy, 'epa' is the organism's energy per atom, 'num_calcs' is the number of energy calculations that had been completed when this organism's energy calculation finished, and 'best_value' is the best value that the algorithm had seen when this organism's energy calculation finished. For fixed composition searches, 'best_value' corresponds to the lowest energy per atom (eV/atom). For phase diagram searches, 'best_value' corresponds the largest area or volume of the convex hull.  
@@ -1134,7 +1134,7 @@ where 'org_id' is the organism ID, 'composition' is the organism's chemical form
 To obtain the intrinsic hardness of the Organisms, another script must be run, which calculates the hardness of the generated structures (using the Electronegativity, Bond-Strength and Cheenady models) from the POSCAR files in the 'garun_*' directory. The output of these calculations is placed in a seperate file name 'hardness_data', which contains the information in 'run_data' along with a few extra columns of the form:
 
 ```
-id		 composition	 total energy		 epa			 num calcs	 best value		 H_EN		 H_BS		 H_C
+id    composition    total_energy    epa    num_calcs    best_value    H_EN    H_BS    H_C
 ```
 
 
