@@ -9,11 +9,12 @@ This module contains the electronegativities of elements, as a dictionary based
 on their atomic number and co-ordination number.
 """
 
-def get_electronegativites():
+def get_EN(Z, CN):
     # Look up electronegativities
     #df_EN = pd.read_excel("EN_lookup.xlsx", header = None, names = range(1,13))
     #df_EN.index = np.arange(1, len(df_EN)+1)
-    d_EN = {
+    
+    EN_dict = {
     1: {1: float('nan'),  2: float('nan'),  3: float('nan'),  4: float('nan'),  5: float('nan'),  6: float('nan'),  7: float('nan'),  8: float('nan'),  9: float('nan'),  10: float('nan'),  11: float('nan'),  12: float('nan')},
     2: {1: float('nan'),  2: float('nan'),  3: float('nan'),  4: float('nan'),  5: float('nan'),  6: float('nan'),  7: float('nan'),  8: float('nan'),  9: float('nan'),  10: float('nan'),  11: float('nan'),  12: float('nan')},
     3: {1: float('nan'),  2: float('nan'),  3: float('nan'),  4: float('nan'),  5: float('nan'),  6: float('nan'),  7: float('nan'),  8: float('nan'),  9: float('nan'),  10: float('nan'),  11: float('nan'),  12: float('nan')},
@@ -92,4 +93,4 @@ def get_electronegativites():
     76: {1: float('nan'),  2: float('nan'),  3: float('nan'),  4: float('nan'),  5: float('nan'),  6: float('nan'),  7: float('nan'),  8: 1.504,  9: float('nan'),  10: float('nan'),  11: float('nan'),  12: float('nan')}
     }
 
-    return d_EN
+    return EN_dict[Z][CN]

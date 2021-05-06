@@ -18,7 +18,6 @@ POSCAR files must be in the same directory as the run_data file
 from gasp import electronegativities
 from pymatgen.core import Structure
 from pymatgen.analysis.local_env import CrystalNN
-import pandas as pd
 import numpy as np
 import math
 import os
@@ -46,8 +45,8 @@ def main():
         f_hard.writelines("\n")
 
 
-    # Get dictionary of electronegativities
-    d_EN = electronegativities.get_electronegativites()
+    ## Get dictionary of electronegativities
+    #d_EN = electronegativities.get_electronegativites(Z, EN)
 
     # Perform calculations on each POSCAR file
     # Each line of the run_data file corresponds to a particular organism, and has it's own POSCAR file.
@@ -76,9 +75,11 @@ def main():
                 #bl = math.dist(structure[site_index].coords, neighbor['site'].coords)
                 bl = np.linalg.norm(structure[site_index].coords - neighbor['site'].coords)            #print(atom.specie, neighbor['site'].specie, "\t", site_index, neighbor['site_index'], "\t", CN1, CN2, "\t", bl)
                 bonds.append({"site_1": site_index, "atom_1": atom.specie,
-                          "Z_1": atom.specie.Z, "CN_1": CN1, "EN_1": d_EN[atom.specie.Z][CN1],
+                          "Z_1": atom.specie.Z, "CN_1": CN1,
+                          "EN_1": electronegativities.get_EN(atom.specie.Z, CN1),
                           "site_2": neighbor['site_index'], "atom_2": neighbor['site'].specie,
-                          "Z_2": neighbor['site'].specie.Z, "CN_2": CN2, "EN_2": d_EN[neighbor['site'].specie.Z][CN2],
+                          "Z_2": neighbor['site'].specie.Z, "CN_2": CN2,
+                          "EN_2": electronegativities.get_EN(neighbor['site'].specie.Z, CN2],
                           "bond_length": bl})
         N = len(bonds)
 
