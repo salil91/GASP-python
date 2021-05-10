@@ -1131,7 +1131,16 @@ id    composition    total_energy    epa    num_calcs    best_value
 
 where 'org_id' is the organism ID, 'composition' is the organism's chemical formula, 'total_energy' is the organism's energy, 'epa' is the organism's energy per atom, 'num_calcs' is the number of energy calculations that had been completed when this organism's energy calculation finished, and 'best_value' is the best value that the algorithm had seen when this organism's energy calculation finished. For fixed composition searches, 'best_value' corresponds to the lowest energy per atom (eV/atom). For phase diagram searches, 'best_value' corresponds the largest area or volume of the convex hull.  
 
-To obtain the intrinsic hardness of the Organisms, another script must be run, which calculates the hardness of the generated structures (using the Electronegativity, Bond-Strength and Cheenady models) from the POSCAR files in the 'garun_*' directory. The output of these calculations is placed in a seperate file name 'hardness_data', which contains the information in 'run_data' along with a few extra columns of the form:
+To obtain the intrinsic hardness of the Organisms, type:
+```
+intrinsic_hardness.py run_data
+```
+or
+```
+gasp_hardness run_data
+```
+
+This script calculates the hardness of the generated structures (using the Electronegativity, Bond-Strength and Cheenady models) from the POSCAR files in the 'garun_*' directory. The output of these calculations is placed in a seperate file name 'hardness_data', which contains the information in 'run_data' along with a few extra columns of the form:
 
 ```
 id    composition    total_energy    epa    num_calcs    best_value    H_EN    H_BS    H_C
