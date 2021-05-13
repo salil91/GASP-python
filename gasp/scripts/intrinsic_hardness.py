@@ -83,6 +83,13 @@ def main():
                           "bond_length": bl})
         N = len(bonds)
 
+        #Temporary fix for when no bonds are found
+    if N == 0:
+        print("No bonds found...")
+        with open(os.path.join(run_data_dir,"hardness_data"), 'a+') as f_hard:
+            f_hard.writelines(line.strip())
+            f_hard.writelines("\t\t nan\t\t nan\t\t nan\n".format(H_EN, H_BS, H_C))
+    else:
         # Calculate Intrinsic hardness
         prod_EN = 1
         prod_BS = 1
@@ -108,9 +115,6 @@ def main():
         H_BS = (1450*N/vol) * prod_BS**(1/N)
         H_C = (865*(N/vol)**1.13) * prod_C**(1/N)
 
-        #print("Vickers hardness, as per EN model = {:.2f}".format(H_EN))
-        #print("Vickers hardness, as per BS model = {:.2f}".format(H_BS))
-        #print("Average Vickers hardness = {:.2f}".format(H_C))
 
         # Write output to file
         with open(os.path.join(run_data_dir,"hardness_data"), 'a') as f_hard:
