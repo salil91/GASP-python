@@ -45,9 +45,6 @@ def main():
         f_hard.writelines("\n")
 
 
-    ## Get dictionary of electronegativities
-    #d_EN = electronegativities.get_electronegativites(Z, EN)
-
     # Perform calculations on each POSCAR file
     # Each line of the run_data file corresponds to a particular organism, and has it's own POSCAR file.
     for line_number, line in enumerate(lines[4:]):
@@ -67,11 +64,16 @@ def main():
         bonds = []
         for site_index, atom in enumerate(structure):
             nn_object = CrystalNN()
-            neighbors = nn_object.get_nn_info(structure, site_index)
+            try:
+                neighbors = nn_object.get_nn_info(structure, site_index)
+            except:
+                continue
+            # if not neighbors: continue
             CN1 = nn_object.get_cn(structure, site_index)
             for neighbor in neighbors:
                 if neighbor['site_index'] < site_index: continue
                 CN2 = nn_object.get_cn(structure, neighbor['site_index'])
+                if CN1==0 or CN2==0: continue
                 #bl = math.dist(structure[site_index].coords, neighbor['site'].coords)
                 bl = np.linalg.norm(structure[site_index].coords - neighbor['site'].coords)            #print(atom.specie, neighbor['site'].specie, "\t", site_index, neighbor['site_index'], "\t", CN1, CN2, "\t", bl)
                 bonds.append({"site_1": site_index, "atom_1": atom.specie,
@@ -84,36 +86,35 @@ def main():
         N = len(bonds)
 
         #Temporary fix for when no bonds are found
-    if N == 0:
-        print("No bonds found...")
-        with open(os.path.join(run_data_dir,"hardness_data"), 'a+') as f_hard:
-            f_hard.writelines(line.strip())
-            f_hard.writelines("\t\t nan\t\t nan\t\t nan\n".format(H_EN, H_BS, H_C))
-    else:
-        # Calculate Intrinsic hardness
-        prod_EN = 1
-        prod_BS = 1
-        prod_C = 1
+        if N == 0:
+            with open(os.path.join(run_data_dir,"hardness_data"), 'a+') as f_hard:
+                f_hard.writelines(line.strip())
+                f_hard.writelines("\t\t nan\t\t nan\t\t nan\n".format(H_EN, H_BS, H_C))
+        else:
+            # Calculate Intrinsic hardness
+            prod_EN = 1
+            prod_BS = 1
+            prod_C = 1
 
-        for bond in bonds:
-            # EN model
-            fi_EN = 0.25*abs(bond["EN_1"] - bond["EN_2"]) / (bond["EN_1"]*bond["EN_2"])**0.5
-            X_ij = ((bond["EN_1"]/bond["CN_1"]) * (bond["EN_2"]/bond["CN_2"]))**0.5
-            prod_EN = prod_EN * (X_ij * math.exp(-2.7*fi_EN))
+            for bond in bonds:
+                # EN model
+                fi_EN = 0.25*abs(bond["EN_1"] - bond["EN_2"]) / (bond["EN_1"]*bond["EN_2"])**0.5
+                X_ij = ((bond["EN_1"]/bond["CN_1"]) * (bond["EN_2"]/bond["CN_2"]))**0.5
+                prod_EN = prod_EN * (X_ij * math.exp(-2.7*fi_EN))
 
-            # BS model
-            fi_BS = ((bond["EN_1"] - bond["EN_2"]) / (bond["EN_1"] + bond["EN_2"]))**2
-            S_ij = (1/bond["CN_1"]/bond["CN_2"]) * (bond["EN_1"]/0.481*bond["EN_2"]/0.481)**0.5 / bond["bond_length"]
-            prod_BS = prod_BS * S_ij * math.exp(-2.8*fi_BS)
+                # BS model
+                fi_BS = ((bond["EN_1"] - bond["EN_2"]) / (bond["EN_1"] + bond["EN_2"]))**2
+                S_ij = (1/bond["CN_1"]/bond["CN_2"]) * (bond["EN_1"]/0.481*bond["EN_2"]/0.481)**0.5 / bond["bond_length"]
+                prod_BS = prod_BS * S_ij * math.exp(-2.8*fi_BS)
 
-            # Cheenady model
-            fi_C = ((bond["EN_1"] - bond["EN_2"]) / (bond["EN_1"] + bond["EN_2"]))**2
-            Z_ij = (bond["EN_1"]/bond["CN_1"]) * (bond["EN_2"]/bond["CN_2"])
-            prod_C = prod_C * (Z_ij**0.35) * (bond["bond_length"]**-1.48) * math.exp(-2.55*fi_C)
+                # Cheenady model
+                fi_C = ((bond["EN_1"] - bond["EN_2"]) / (bond["EN_1"] + bond["EN_2"]))**2
+                Z_ij = (bond["EN_1"]/bond["CN_1"]) * (bond["EN_2"]/bond["CN_2"])
+                prod_C = prod_C * (Z_ij**0.35) * (bond["bond_length"]**-1.48) * math.exp(-2.55*fi_C)
 
-        H_EN = (469.27*N/vol) * prod_EN**(1/N) - 7.24
-        H_BS = (1450*N/vol) * prod_BS**(1/N)
-        H_C = (865*(N/vol)**1.13) * prod_C**(1/N)
+            H_EN = (469.27*N/vol) * prod_EN**(1/N) - 7.24
+            H_BS = (1450*N/vol) * prod_BS**(1/N)
+            H_C = (865*(N/vol)**1.13) * prod_C**(1/N)
 
 
         # Write output to file
