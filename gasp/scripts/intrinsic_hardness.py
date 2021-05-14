@@ -70,18 +70,21 @@ def main():
                 continue
             # if not neighbors: continue
             CN1 = nn_object.get_cn(structure, site_index)
+            if CN1==0: continue
+            EN1_c = electronegativities.get_EN(atom.specie.Z, CN1)
+            EN1_p = atom.specie.X
             for neighbor in neighbors:
                 if neighbor['site_index'] < site_index: continue
                 CN2 = nn_object.get_cn(structure, neighbor['site_index'])
-                if CN1==0 or CN2==0: continue
+                if CN2==0: continue
+                EN2_c = electronegativities.get_EN(neighbor['site'].specie.Z, CN2)
+                EN2_p = neighbor['site'].specie.X
                 #bl = math.dist(structure[site_index].coords, neighbor['site'].coords)
                 bl = np.linalg.norm(structure[site_index].coords - neighbor['site'].coords)            #print(atom.specie, neighbor['site'].specie, "\t", site_index, neighbor['site_index'], "\t", CN1, CN2, "\t", bl)
                 bonds.append({"site_1": site_index, "atom_1": atom.specie,
-                          "Z_1": atom.specie.Z, "CN_1": CN1,
-                          "EN_1": electronegativities.get_EN(atom.specie.Z, CN1),
+                          "Z_1": atom.specie.Z, "CN_1": CN1, "EN_1": EN1,
                           "site_2": neighbor['site_index'], "atom_2": neighbor['site'].specie,
-                          "Z_2": neighbor['site'].specie.Z, "CN_2": CN2,
-                          "EN_2": electronegativities.get_EN(neighbor['site'].specie.Z, CN2),
+                          "Z_2": neighbor['site'].specie.Z, "CN_2": CN2, "EN_2": EN2_c,
                           "bond_length": bl})
         N = len(bonds)
 
