@@ -53,7 +53,7 @@ class Plotter(object):
 
         # set the font to Times, rendered with Latex
         plt.rc('font', **{'family': 'serif', 'serif': ['Times']})
-        plt.rc('text', usetex=True)
+        # plt.rc('text', usetex=True)
 
         # parse the number of composition space endpoints
         endpoints_line = self.lines[0].split()
@@ -105,8 +105,10 @@ class Plotter(object):
         """
         Plots the best value versus the number of energy calculations.
         """
-
-        self.get_progress_plot().show()
+        
+        fig = self.get_progress_plot()
+        fig.savefig("plot_progress.png", dpi=150)
+        fig.show()
 
     def get_system_size_plot(self):
         """
@@ -116,7 +118,7 @@ class Plotter(object):
 
         # set the font to Times, rendered with Latex
         plt.rc('font', **{'family': 'serif', 'serif': ['Times']})
-        plt.rc('text', usetex=True)
+        # plt.rc('text', usetex=True)
 
         # parse the compositions and numbers of energy calculations
         compositions = []
@@ -150,7 +152,9 @@ class Plotter(object):
         Plots the system size versus the number of energy calculations.
         """
 
-        self.get_system_size_plot().show()
+        fig = self.get_system_size_plot()
+        fig.savefig("plot_system_size.png", dpi=150)
+        fig.show()
 
     def get_phase_diagram_plot(self):
         """
@@ -200,4 +204,8 @@ class Plotter(object):
         Plots the phase diagram.
         """
 
-        self.get_phase_diagram_plot().show()
+        fig = self.get_phase_diagram_plot()
+        fig.write_image("plot_phase_diagram.png", width=1200, height=900)
+        fig.write_html("plot_phase_diagram.html")
+        fig.show()
+        
