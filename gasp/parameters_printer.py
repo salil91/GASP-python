@@ -42,7 +42,8 @@ def print_parameters(objects_dict, lat_match_dict=None):
     energy_calculator = objects_dict['energy_calculator']
     pool = objects_dict['pool']
     variations = objects_dict['variations']
-    job_specs = objects_dict['job_specs']
+    if "job_specs" in objects_dict.keys():
+        job_specs = objects_dict['job_specs']
 
     # make the file where the parameters will be printed
     with open(os.getcwd() + '/ga_parameters', 'w') as parameters_file:
@@ -328,7 +329,7 @@ def print_parameters(objects_dict, lat_match_dict=None):
         parameters_file.write('\n')
 
         # write the job_specs of the dask-worker including defaults (if any)
-        if job_specs:
+        try:
             parameters_file.write('job_specs: \n')
             parameters_file.write('    cores: ' + str(job_specs['cores']) + '\n')
             parameters_file.write('    memory: ' + job_specs['memory'] + '\n')
@@ -336,10 +337,14 @@ def print_parameters(objects_dict, lat_match_dict=None):
             parameters_file.write('    queue: ' + job_specs['queue'] + '\n')
             parameters_file.write('    walltime: ' + job_specs['walltime'] + '\n')
             parameters_file.write('    interface: ' + job_specs['interface'] + '\n')
-            if 'job_extra' in job_specs:
+            if 'job_extra' in job_specs:  #TODO: Change job_extra to CamelCase
                 parameters_file.write('    job_extra: \n')
                 for i in range(len(job_specs['job_extra'])):
                     parameters_file.write('        - %r \n' % str(
                                                 job_specs['job_extra'][i]))
+        except UnboundLocalError:
+            parameters_file.write('')
+            pass
+
 
         parameters_file.write('\n')

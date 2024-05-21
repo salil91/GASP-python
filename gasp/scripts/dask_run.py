@@ -18,16 +18,17 @@ from gasp import population
 from gasp import objects_maker
 from gasp import parameters_printer
 from gasp import interface
-from pymatgen.symmetry.analyzer import SpacegroupAnalyzer
 
 import copy
-import threading
 import random
 import sys
 import yaml
 import os
 import datetime
 from time import sleep
+
+# Python multiprocessing
+from concurrent.futures import ProcessPoolExecutor
 
 # import dask
 from dask_jobqueue import SLURMCluster
@@ -102,7 +103,11 @@ def main():
     pool = objects_dict['pool']
     variations = objects_dict['variations']
     id_generator = objects_dict['id_generator']
-    job_specs = objects_dict['job_specs']
+    if 'job_specs' in objects_dict.keys():
+        use_dask = True
+        job_specs = objects_dict['job_specs']
+    else:
+        use_dask = False
 
     # get the path to the run directory - append date and time if
     # the given or default run directory already exists
@@ -133,15 +138,18 @@ def main():
                             composition_space, sub_search=substrate_search)
 
     # start cluster and scale jobs
-    cluster_job = SLURMCluster(cores=job_specs['cores'],
-                               memory=job_specs['memory'],
-                               project=job_specs['project'],
-                               queue=job_specs['queue'],
-                               interface=job_specs['interface'],
-                               walltime=job_specs['walltime'],
-                               job_extra=job_specs['job_extra'])
-    cluster_job.scale(num_calcs_at_once) # number of parallel jobs
-    client  = Client(cluster_job)
+    if use_dask:
+        cluster_job = SLURMCluster(cores=job_specs['cores'],
+                                memory=job_specs['memory'],
+                                project=job_specs['project'],
+                                queue=job_specs['queue'],
+                                interface=job_specs['interface'],
+                                walltime=job_specs['walltime'],
+                                job_extra=job_specs['job_extra'])
+        cluster_job.scale(num_calcs_at_once) # number of parallel jobs
+        client  = Client(cluster_job)
+    else:
+        client = ProcessPoolExecutor(max_workers=num_calcs_at_once)
 
     # To hold futures
     futures = []
