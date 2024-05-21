@@ -43,7 +43,10 @@ def print_parameters(objects_dict, lat_match_dict=None):
     pool = objects_dict['pool']
     variations = objects_dict['variations']
     if "job_specs" in objects_dict.keys():
+        use_dask = True
         job_specs = objects_dict['job_specs']
+    else:
+        use_dask = False
 
     # make the file where the parameters will be printed
     with open(os.getcwd() + '/ga_parameters', 'w') as parameters_file:
@@ -329,7 +332,7 @@ def print_parameters(objects_dict, lat_match_dict=None):
         parameters_file.write('\n')
 
         # write the job_specs of the dask-worker including defaults (if any)
-        try:
+        if use_dask:
             parameters_file.write('job_specs: \n')
             parameters_file.write('    cores: ' + str(job_specs['cores']) + '\n')
             parameters_file.write('    memory: ' + job_specs['memory'] + '\n')
@@ -342,9 +345,6 @@ def print_parameters(objects_dict, lat_match_dict=None):
                 for i in range(len(job_specs['job_extra'])):
                     parameters_file.write('        - %r \n' % str(
                                                 job_specs['job_extra'][i]))
-        except UnboundLocalError:
-            parameters_file.write('')
-            pass
 
 
         parameters_file.write('\n')

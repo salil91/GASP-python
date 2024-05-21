@@ -103,11 +103,14 @@ def main():
     pool = objects_dict['pool']
     variations = objects_dict['variations']
     id_generator = objects_dict['id_generator']
+
     if 'job_specs' in objects_dict.keys():
         use_dask = True
+        print("Using Dask for parallel calculations")
         job_specs = objects_dict['job_specs']
     else:
         use_dask = False
+        print("Using Python ProcessPoolExecutor for parallel calculations")
 
     # get the path to the run directory - append date and time if
     # the given or default run directory already exists
