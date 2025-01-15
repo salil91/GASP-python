@@ -27,17 +27,6 @@ import os
 import datetime
 from time import sleep
 
-# Python multiprocessing
-from concurrent.futures import ProcessPoolExecutor
-
-# import dask
-from dask_jobqueue import SLURMCluster
-from dask.distributed import Client
-
-# change worker unresponsive time to 3h (Assuming max elapsed time for one calc)
-import dask
-import dask.distributed
-dask.config.set({'distributed.comm.timeouts.tcp': '3h'})
 
 def main():
     # get dictionaries from the input file (in yaml format)
@@ -142,6 +131,14 @@ def main():
 
     # start cluster and scale jobs
     if use_dask:
+        # import dask
+        from dask_jobqueue import SLURMCluster
+        from dask.distributed import Client
+
+        # change worker unresponsive time to 3h (Assuming max elapsed time for one calc)
+        import dask.config
+        dask.config.set({'distributed.comm.timeouts.tcp': '3h'})
+
         cluster_job = SLURMCluster(cores=job_specs['cores'],
                                 memory=job_specs['memory'],
                                 project=job_specs['project'],
@@ -149,9 +146,12 @@ def main():
                                 interface=job_specs['interface'],
                                 walltime=job_specs['walltime'],
                                 job_extra=job_specs['job_extra'])
-        cluster_job.scale(num_calcs_at_once) # number of parallel jobs
+        cluster_job.scale(num_calcs_at_once)  # number of parallel jobs
         client  = Client(cluster_job)
     else:
+        # Python multiprocessing
+        from concurrent.futures import ProcessPoolExecutor
+        
         client = ProcessPoolExecutor(max_workers=num_calcs_at_once)
 
     # To hold futures
@@ -168,6 +168,7 @@ def main():
             working_jobs = len([i for i, f in enumerate(futures) \
                                                 if not f.done()])
             if working_jobs < num_calcs_at_once:
+                # TODO: parallelize this 
                 # make a new organism - keep trying until we get one
                 new_organism = creator.create_organism(
                     id_generator, composition_space, constraints, random)
