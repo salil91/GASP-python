@@ -60,8 +60,8 @@ def main():
         substrate_search = True
 
     if substrate_search:
-        max_area = match_constraints['max_area']
         match_constraints = objects_maker.get_lat_match_params(parameters)
+        max_area = match_constraints['max_area']
         substrate_params = objects_maker.get_substrate_params(parameters)
         main_keys = ['E_sub_prim', 'n_sub_prim', 'mu_A']
         for key in main_keys:
