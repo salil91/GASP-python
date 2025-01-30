@@ -1,4 +1,4 @@
-maGASP is a genetic algorithm for structure and phase prediction written in Python and interfaced to GULP_, LAMMPS_ and VASP_. It can search for the structures of clusters, 2D materials, wires, and bulk materials and do both fixed-composition and phase diagram searches.
+GASP is a genetic algorithm for structure and phase prediction written in Python and interfaced to GULP_, LAMMPS_ and VASP_. It can search for the structures of clusters, 2D materials, wires, and bulk materials and do both fixed-composition and phase diagram searches.
 
 .. _VASP: http://www.vasp.at/
 .. _LAMMPS: http://lammps.sandia.gov/
