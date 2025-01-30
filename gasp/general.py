@@ -38,8 +38,7 @@ from pymatgen.core.composition import Composition
 from pymatgen.core.periodic_table import Element, DummySpecie
 from pymatgen.analysis.phase_diagram import CompoundPhaseDiagram
 from pymatgen.analysis.phase_diagram import PDEntry
-from pymatgen.transformations.standard_transformations import \
-    RotationTransformation
+from pymatgen.transformations.standard_transformations import RotationTransformation
 
 import numpy as np
 
@@ -90,8 +89,7 @@ class Organism(object):
         self.cell = cell
         self.composition = self.cell.composition
         # position in composition space. Only used for phase diagram searches
-        self.composition_vector = self.compute_composition_vector(
-            composition_space)
+        self.composition_vector = self.compute_composition_vector(composition_space)
         self.total_energy = None
         # the objective function value
         self.value = None
@@ -120,8 +118,7 @@ class Organism(object):
         # Number of atoms of the substrate in the interface
         self.n_sub = None
         # Save interface cell or just 2D cell
-        self.interface_cell=None
-
+        self.interface_cell = None
 
     # This keeps the id (sort of) immutable by causing an exception to be
     # raised if the id is attempted to be set with org.id = some_id.
@@ -137,42 +134,41 @@ class Organism(object):
             composition_space: the CompositionSpace of the search.
         """
 
-        if composition_space.objective_function == 'epa':
+        if composition_space.objective_function == "epa":
             return None
-        elif composition_space.objective_function == 'pd':
+        elif composition_space.objective_function == "pd":
             # make CompoundPhaseDiagram and PDAnalyzer objects
             pdentries = []
             for endpoint in composition_space.endpoints:
                 pdentries.append(PDEntry(endpoint, -10))
-            compound_pd = CompoundPhaseDiagram(pdentries,
-                                               composition_space.endpoints)
+            compound_pd = CompoundPhaseDiagram(pdentries, composition_space.endpoints)
 
             # transform the organism's composition
             transformed_entry = compound_pd.transform_entries(
-                [PDEntry(self.composition, 10)], composition_space.endpoints)
+                [PDEntry(self.composition, 10)], composition_space.endpoints
+            )
 
             # get the transformed species and amounts
             if len(transformed_entry[0]) == 0:
                 return None
             transformed_list = str(transformed_entry[0][0]).split()
             del transformed_list[0]
-            popped = ''
-            while popped != 'with':
+            popped = ""
+            while popped != "with":
                 popped = transformed_list.pop()
 
             # separate the dummy species symbols from the amounts
             symbols = []
             amounts = []
             for entry in transformed_list:
-                split_entry = entry.split('0+')
+                split_entry = entry.split("0+")
                 symbols.append(split_entry[0])
                 amounts.append(float(split_entry[1]))
 
             # make a dictionary mapping dummy species to amounts
             dummy_species_amounts = {}
             for i in range(len(symbols)):
-                dummy_species_amounts[DummySpecie(symbol=symbols[i])] = \
-                    amounts[i]
+                dummy_species_amounts[DummySpecie(symbol=symbols[i])] = amounts[i]
 
             # make Composition object with dummy species, get decomposition
             dummy_comp = Composition(dummy_species_amounts)
@@ -183,7 +179,7 @@ class Organism(object):
             formatted_decomp = {}
             for key in decomp:
                 key_dict = key.as_dict()
-                comp = Composition(key_dict['entry']['composition'])
+                comp = Composition(key_dict["entry"]["composition"])
                 formatted_decomp[comp] = decomp[key]
 
             # make the composition vector
@@ -217,19 +213,32 @@ class Cell(Structure):
     Represents a cell. Provides additional functionality to the
     pymatgen.core.structure.Structure class.
     """
-    def __init__(self, lattice, species, coords, charge=None,
-                    validate_proximity=False, to_unit_cell=False,
-                    coords_are_cartesian=False, site_properties=None):
+
+    def __init__(
+        self,
+        lattice,
+        species,
+        coords,
+        charge=None,
+        validate_proximity=False,
+        to_unit_cell=False,
+        coords_are_cartesian=False,
+        site_properties=None,
+    ):
         """
         Takes all the attributes from Structure object and makes it into
         a Cell object.
         """
-        super(Cell, self).__init__(lattice, species, coords, charge=charge,
-                                        validate_proximity=validate_proximity,
-                                        to_unit_cell=to_unit_cell,
-                                        coords_are_cartesian=coords_are_cartesian,
-                                        site_properties=site_properties)
-
+        super(Cell, self).__init__(
+            lattice,
+            species,
+            coords,
+            charge=charge,
+            validate_proximity=validate_proximity,
+            to_unit_cell=to_unit_cell,
+            coords_are_cartesian=coords_are_cartesian,
+            site_properties=site_properties,
+        )
 
     def rotate_to_principal_directions(self):
         """
@@ -244,25 +253,30 @@ class Cell(Structure):
 
         # rotate about the z-axis to align a vertically with the x-axis
         rotation = RotationTransformation(
-            [0, 0, 1], 180 - (180/np.pi)*np.arctan2(
-                    self.lattice.matrix[0][1],
-                    self.lattice.matrix[0][0]))
+            [0, 0, 1],
+            180
+            - (180 / np.pi)
+            * np.arctan2(self.lattice.matrix[0][1], self.lattice.matrix[0][0]),
+        )
         new_structure = rotation.apply_transformation(self)
         self.lattice = new_structure.lattice
 
         # rotate about the y-axis to make a parallel to the x-axis
         rotation = RotationTransformation(
-                [0, 1, 0], (180/np.pi)*np.arctan2(
-                    self.lattice.matrix[0][2],
-                    self.lattice.matrix[0][0]))
+            [0, 1, 0],
+            (180 / np.pi)
+            * np.arctan2(self.lattice.matrix[0][2], self.lattice.matrix[0][0]),
+        )
         new_structure = rotation.apply_transformation(self)
         self.lattice = new_structure.lattice
 
         # rotate about the x-axis to make b lie in the x-y plane
         rotation = RotationTransformation(
-                [1, 0, 0], 180 - (180/np.pi)*np.arctan2(
-                    self.lattice.matrix[1][2],
-                    self.lattice.matrix[1][1]))
+            [1, 0, 0],
+            180
+            - (180 / np.pi)
+            * np.arctan2(self.lattice.matrix[1][2], self.lattice.matrix[1][1]),
+        )
         new_structure = rotation.apply_transformation(self)
         self.lattice = new_structure.lattice
 
@@ -285,7 +299,7 @@ class Cell(Structure):
             # the components of c
             cx = self.lattice.matrix[2][0]
             cy = self.lattice.matrix[2][1]
-            cz = -1*self.lattice.matrix[2][2]
+            cz = -1 * self.lattice.matrix[2][2]
             self.lattice = Lattice([a, b, [cx, cy, cz]])
 
     def rotate_c_parallel_to_z(self):
@@ -299,17 +313,21 @@ class Cell(Structure):
 
         # rotate about the z-axis until c lies in the x-z plane
         rotation = RotationTransformation(
-                [0, 0, 1], 180 - (180/np.pi)*np.arctan2(
-                    self.lattice.matrix[2][1],
-                    self.lattice.matrix[2][0]))
+            [0, 0, 1],
+            180
+            - (180 / np.pi)
+            * np.arctan2(self.lattice.matrix[2][1], self.lattice.matrix[2][0]),
+        )
         new_structure = rotation.apply_transformation(self)
         self.lattice = new_structure.lattice
 
         # rotate about the y-axis to make c parallel to the z-axis
         rotation = RotationTransformation(
-            [0, 1, 0], 180 - (180/np.pi)*np.arctan2(
-                self.lattice.matrix[2][0],
-                self.lattice.matrix[2][2]))
+            [0, 1, 0],
+            180
+            - (180 / np.pi)
+            * np.arctan2(self.lattice.matrix[2][0], self.lattice.matrix[2][2]),
+        )
         new_structure = rotation.apply_transformation(self)
         self.lattice = new_structure.lattice
 
@@ -337,17 +355,17 @@ class Cell(Structure):
         # determine the needed shift along each lattice vector
         for i in range(3):
             if bounding_box[i][0] < 0.0:
-                translation_vector.append(-1*(bounding_box[i][0]) + 0.001)
+                translation_vector.append(-1 * (bounding_box[i][0]) + 0.001)
             elif bounding_box[i][1] >= 1.0:
-                translation_vector.append(-1*(bounding_box[i][1] + 0.001) +
-                                          1.0)
+                translation_vector.append(-1 * (bounding_box[i][1] + 0.001) + 1.0)
             else:
                 translation_vector.append(0.0)
 
         # do the shift
         site_indices = [i for i in range(len(self.sites))]
-        self.translate_sites(site_indices, translation_vector,
-                             frac_coords=True, to_unit_cell=False)
+        self.translate_sites(
+            site_indices, translation_vector, frac_coords=True, to_unit_cell=False
+        )
 
     def reduce_cell(self):
         """
@@ -373,8 +391,7 @@ class Cell(Structure):
             site_indices.append(i)
         self.remove_sites(site_indices)
         for i in range(len(rcartesian_coords)):
-            self.append(rspecies[i], rcartesian_coords[i],
-                        coords_are_cartesian=True)
+            self.append(rspecies[i], rcartesian_coords[i], coords_are_cartesian=True)
 
         # rotate the cell into the principal directions
         self.rotate_to_principal_directions()
@@ -463,10 +480,19 @@ class OffspringGenerator(object):
     live.
     """
 
-    def make_offspring_organism(self, random, pool, variations, geometry,
-                                id_generator, whole_pop, developer,
-                                redundancy_guard, composition_space,
-                                constraints):
+    def make_offspring_organism(
+        self,
+        random,
+        pool,
+        variations,
+        geometry,
+        id_generator,
+        whole_pop,
+        developer,
+        redundancy_guard,
+        composition_space,
+        constraints,
+    ):
         """
         Returns a developed, non-redundant, unrelaxed offspring organism
         generated with one of the variations.
@@ -517,17 +543,18 @@ class OffspringGenerator(object):
         max_num_tries = 1000
 
         while True:
-            variation = self.select_variation(random, tried_variations,
-                                              variations)
+            variation = self.select_variation(random, tried_variations, variations)
             num_tries = 0
             while num_tries < max_num_tries:
                 offspring = variation.do_variation(
-                    pool, random, geometry, constraints, id_generator,
-                    composition_space)
+                    pool, random, geometry, constraints, id_generator, composition_space
+                )
                 if developer.develop(
-                        offspring, composition_space, constraints, geometry,
-                        pool) and (redundancy_guard.check_redundancy(
-                            offspring, whole_pop, geometry) is None):
+                    offspring, composition_space, constraints, geometry, pool
+                ) and (
+                    redundancy_guard.check_redundancy(offspring, whole_pop, geometry)
+                    is None
+                ):
                     return offspring
                 else:
                     num_tries = num_tries + 1
@@ -556,9 +583,11 @@ class OffspringGenerator(object):
             rand = random.random()
             lower_bound = 0
             for i in range(len(variations)):
-                if rand > lower_bound and rand <= (
-                        lower_bound + variations[i].fraction) and \
-                        variations[i] not in tried_variations:
+                if (
+                    rand > lower_bound
+                    and rand <= (lower_bound + variations[i].fraction)
+                    and variations[i] not in tried_variations
+                ):
                     return variations[i]
                 else:
                     lower_bound = lower_bound + variations[i].fraction
@@ -590,28 +619,28 @@ class SelectionProbDist(object):
         self.default_power = 1
 
         # if entire Selection block was left blank or set to default
-        if selection_params in (None, 'default'):
+        if selection_params in (None, "default"):
             self.num_parents = self.default_num_parents
             self.power = self.default_power
         else:
             # check the num_parents parameter
-            if 'num_parents' not in selection_params:
+            if "num_parents" not in selection_params:
                 self.num_parents = self.default_num_parents
-            elif selection_params['num_parents'] in (None, 'default'):
+            elif selection_params["num_parents"] in (None, "default"):
                 self.num_parents = self.default_num_parents
             # check that the given number isn't larger than the pool size
-            elif selection_params['num_parents'] > pool_size:
+            elif selection_params["num_parents"] > pool_size:
                 self.num_parents = self.default_num_parents
             else:
-                self.num_parents = selection_params['num_parents']
+                self.num_parents = selection_params["num_parents"]
 
             # check the power parameter
-            if 'power' not in selection_params:
+            if "power" not in selection_params:
                 self.power = self.default_power
-            elif selection_params['power'] in (None, 'default'):
+            elif selection_params["power"] in (None, "default"):
                 self.power = self.default_power
             else:
-                self.power = selection_params['power']
+                self.power = selection_params["power"]
 
 
 class CompositionSpace(object):
@@ -646,20 +675,20 @@ class CompositionSpace(object):
         self.center = self.get_center()
 
         # the distance from an endpoint to the center
-        self.max_dist_from_center = (float(len(self.endpoints) - 1))/float(len(
-            self.endpoints))
+        self.max_dist_from_center = (float(len(self.endpoints) - 1)) / float(
+            len(self.endpoints)
+        )
 
         species_dict = {}
         elems = self.get_all_elements()
         # Specify species A, B, C always in increasing atomic number
         sorted_elems = sorted(elems, key=lambda x: x.number)
-        species_dict['specie_A'] = sorted_elems[0]
+        species_dict["specie_A"] = sorted_elems[0]
         if len(elems) > 1:
-            species_dict['specie_B'] = sorted_elems[1]
+            species_dict["specie_B"] = sorted_elems[1]
         if len(elems) > 2:
-            species_dict['specie_C'] = sorted_elems[2]
+            species_dict["specie_C"] = sorted_elems[2]
         self.species_dict = species_dict
-
 
     def infer_objective_function(self):
         """
@@ -686,18 +715,18 @@ class CompositionSpace(object):
         """
 
         if len(self.endpoints) == 1:
-            obj = 'epa'
+            obj = "epa"
         else:
             for point in self.endpoints:
                 for next_point in self.endpoints:
                     if not point.almost_equals(next_point, 0.0, 0.0):
-                        obj = 'pd'
+                        obj = "pd"
 
         # For substrate search, use 'epa' here. However, chemical potential
         # based surface free energy is used as objective function, although,
         # it reads 'epa'. See energy_calculators.do_energy_calculation for more
         if self.sub_search:
-            obj = 'epa'
+            obj = "epa"
 
         return obj
 
@@ -708,23 +737,27 @@ class CompositionSpace(object):
 
         center_vect = []
         for _ in range(len(self.endpoints)):
-            center_vect.append(1/len(self.endpoints))
+            center_vect.append(1 / len(self.endpoints))
         return np.array(center_vect)
 
     def get_all_elements(self):
         """
         Returns a list of all the elements
         (as pymatgen.core.periodic_table.Element objects) that are in the
-        composition space.
+        composition space. Elements are ordered by increasing atomic number.
         """
 
         # get each element type from the composition_space object
         elements = []
         for point in self.endpoints:
-            elements = elements + point.elements
+            elements += point.elements
 
         # remove duplicates
         elements = list(set(elements))
+
+        # sort by increasing atomic number
+        elements.sort(key=lambda x: x.Z)
+
         return elements
 
     def get_all_pairs(self):
@@ -741,8 +774,7 @@ class CompositionSpace(object):
         pairs = []
         for i in range(0, len(elements) - 1):
             for j in range(i + 1, len(elements)):
-                pairs.append(str(elements[i].symbol + " " +
-                                 elements[j].symbol))
+                pairs.append(str(elements[i].symbol + " " + elements[j].symbol))
         return pairs
 
     def get_all_swappable_pairs(self):
@@ -788,25 +820,25 @@ class CompositionFitnessWeight(object):
 
         # if entire CompositionFitnessWeight block was left blank or set to
         # default
-        if comp_fitness_params in (None, 'default'):
+        if comp_fitness_params in (None, "default"):
             self.max_weight = self.default_max_weight
             self.power = self.default_power
         else:
             # check the max_weight parameter
-            if 'max_weight' not in comp_fitness_params:
+            if "max_weight" not in comp_fitness_params:
                 self.max_weight = self.default_max_weight
-            elif comp_fitness_params['max_weight'] in (None, 'default'):
+            elif comp_fitness_params["max_weight"] in (None, "default"):
                 self.max_weight = self.default_max_weight
             else:
-                self.max_weight = comp_fitness_params['max_weight']
+                self.max_weight = comp_fitness_params["max_weight"]
 
             # check the power parameter
-            if 'power' not in comp_fitness_params:
+            if "power" not in comp_fitness_params:
                 self.power = self.default_power
-            elif comp_fitness_params['power'] in (None, 'default'):
+            elif comp_fitness_params["power"] in (None, "default"):
                 self.power = self.default_power
             else:
-                self.power = comp_fitness_params['power']
+                self.power = comp_fitness_params["power"]
 
 
 class StoppingCriteria(object):
@@ -849,45 +881,42 @@ class StoppingCriteria(object):
         self.calc_counter = 0
 
         # set defaults if stopping_parameters equals 'default' or None
-        if stopping_parameters in (None, 'default'):
+        if stopping_parameters in (None, "default"):
             self.num_energy_calcs = self.default_num_energy_calcs
             self.epa_achieved = self.default_epa_achieved
             self.found_cell = self.default_found_cell
         # check each keyword to see if it's been included
         else:
             # value achieved
-            if 'epa_achieved' in stopping_parameters:
-                if stopping_parameters['epa_achieved'] in (None, 'default'):
+            if "epa_achieved" in stopping_parameters:
+                if stopping_parameters["epa_achieved"] in (None, "default"):
                     self.epa_achieved = self.default_epa_achieved
-                elif composition_space.objective_function == 'epa':
-                    self.epa_achieved = stopping_parameters['epa_achieved']
+                elif composition_space.objective_function == "epa":
+                    self.epa_achieved = stopping_parameters["epa_achieved"]
             else:
                 self.epa_achieved = self.default_epa_achieved
 
             # found structure
-            if 'found_structure' in stopping_parameters:
-                if stopping_parameters['found_structure'] in (None, 'default'):
+            if "found_structure" in stopping_parameters:
+                if stopping_parameters["found_structure"] in (None, "default"):
                     self.found_cell = self.default_found_cell
                 else:
-                    self.path_to_structure_file = stopping_parameters[
-                        'found_structure']
+                    self.path_to_structure_file = stopping_parameters["found_structure"]
                     self.found_cell = Cell.from_file(
-                            stopping_parameters['found_structure'])
+                        stopping_parameters["found_structure"]
+                    )
             else:
                 self.found_cell = self.default_found_cell
 
             # number energy calculations
-            if 'num_energy_calcs' in stopping_parameters:
-                if stopping_parameters['num_energy_calcs'] in (None,
-                                                               'default'):
-                    if self.epa_achieved is None and \
-                            self.found_cell is None:
+            if "num_energy_calcs" in stopping_parameters:
+                if stopping_parameters["num_energy_calcs"] in (None, "default"):
+                    if self.epa_achieved is None and self.found_cell is None:
                         self.num_energy_calcs = self.default_num_energy_calcs
                     else:
                         self.num_energy_calcs = None
                 else:
-                    self.num_energy_calcs = stopping_parameters[
-                        'num_energy_calcs']
+                    self.num_energy_calcs = stopping_parameters["num_energy_calcs"]
             elif self.epa_achieved is None and self.found_cell is None:
                 self.num_energy_calcs = self.default_num_energy_calcs
             else:
@@ -924,17 +953,14 @@ class StoppingCriteria(object):
 
         # check the structure if needed
         if self.found_cell is not None:
-            if geometry.shape == 'cluster':
-                mol1 = Molecule(organism.cell.species,
-                                organism.cell.cart_coords)
-                mol2 = Molecule(self.found_cell.species,
-                                self.found_cell.cart_coords)
-                self.are_satisfied = \
-                    redundancy_guard.molecule_matcher.fit(mol1, mol2)
+            if geometry.shape == "cluster":
+                mol1 = Molecule(organism.cell.species, organism.cell.cart_coords)
+                mol2 = Molecule(self.found_cell.species, self.found_cell.cart_coords)
+                self.are_satisfied = redundancy_guard.molecule_matcher.fit(mol1, mol2)
             else:
-                self.are_satisfied = \
-                    redundancy_guard.structure_matcher.fit(organism.cell,
-                                                           self.found_cell)
+                self.are_satisfied = redundancy_guard.structure_matcher.fit(
+                    organism.cell, self.found_cell
+                )
 
 
 class DataWriter(object):
@@ -955,24 +981,27 @@ class DataWriter(object):
             sub_search (bool): whether it is interface geometry search
         """
 
-        self.file_path = garun_dir + '/run_data'
+        self.file_path = garun_dir + "/run_data"
         self.sub_search = sub_search
-        with open(self.file_path, 'a') as data_file:
-            data_file.write('Composition space endpoints: ')
+        with open(self.file_path, "a") as data_file:
+            data_file.write("Composition space endpoints: ")
             for endpoint in composition_space.endpoints:
-                data_file.write(' {}'.format(
-                    endpoint.reduced_formula.replace(' ', '')))
-            data_file.write('\n\n')
+                data_file.write(" {}".format(endpoint.reduced_formula.replace(" ", "")))
+            data_file.write("\n\n")
             if not sub_search:
-                data_file.write('id\t\t composition\t total energy\t\t '
-                                'epa\t\t\t num calcs\t best value\n\n')
+                data_file.write(
+                    "id\t\t composition\t total energy\t\t "
+                    "epa\t\t\t num calcs\t best value\n\n"
+                )
             else:
-                data_file.write('id\t comp\t n-2D\t n-sub\t surface area\t '
-                                'total energy\t  epa\t\t num calcs\t best value\n\n')
+                data_file.write(
+                    "id\t comp\t n-2D\t n-sub\t surface area\t "
+                    "total energy\t  epa\t\t num calcs\t best value\n\n"
+                )
 
-        self.genes_file = garun_dir + '/genes_data'
-        with open(self.genes_file, 'a') as genes:
-            genes.write('id\t parents id(s)\t maker\n\n')
+        self.genes_file = garun_dir + "/genes_data"
+        with open(self.genes_file, "a") as genes:
+            genes.write("id\t parents id(s)\t maker\n\n")
 
     def write_data(self, organism, num_calcs, progress):
         """
@@ -996,38 +1025,55 @@ class DataWriter(object):
             progress = 0.0
 
         # determine how many tabs to use after the composition
-        formula = organism.composition.formula.replace(' ', '')
+        formula = organism.composition.formula.replace(" ", "")
         if len(formula) > 8:
-            format_string = '{0}\t\t {1}\t {2:.6f}\t\t {3:.6f}\t\t {4}\t\t'
+            format_string = "{0}\t\t {1}\t {2:.6f}\t\t {3:.6f}\t\t {4}\t\t"
         else:
-            format_string = '{0}\t\t {1}\t\t {2:.6f}\t\t {3:.6f}\t\t {4}\t\t'
-        if self.sub_search: # if this is a substrate search
-            format_string = '{0}\t {1}\t {2}\t {3}\t {4:.6f}\t {5:.6f}\t {6:.6f}\t {7}\t\t'
+            format_string = "{0}\t\t {1}\t\t {2:.6f}\t\t {3:.6f}\t\t {4}\t\t"
+        if self.sub_search:  # if this is a substrate search
+            format_string = (
+                "{0}\t {1}\t {2}\t {3}\t {4:.6f}\t {5:.6f}\t {6:.6f}\t {7}\t\t"
+            )
             num_twod = len(organism.cell.sites)
             ab = organism.cell.lattice.matrix[:2]
             org_surface_area = np.linalg.norm(np.cross(ab[0], ab[1]))
 
-
         # determine what to write for the progress
         if self.sub_search:
-            format_string = format_string + ' {8:.6f}\n'
+            format_string = format_string + " {8:.6f}\n"
         else:
             if progress is None:
-                format_string = format_string + ' None\n'
+                format_string = format_string + " None\n"
             else:
-                format_string = format_string + ' {5:.6f}\n'
+                format_string = format_string + " {5:.6f}\n"
 
         # write the line to the file
-        with open(self.file_path, 'a') as data_file:
+        with open(self.file_path, "a") as data_file:
             if self.sub_search:
-                data_file.write(format_string.format(
-                    organism.id, formula, num_twod, organism.n_sub,
-                    org_surface_area, organism.total_energy, organism.epa,
-                    num_calcs, progress))
+                data_file.write(
+                    format_string.format(
+                        organism.id,
+                        formula,
+                        num_twod,
+                        organism.n_sub,
+                        org_surface_area,
+                        organism.total_energy,
+                        organism.epa,
+                        num_calcs,
+                        progress,
+                    )
+                )
             else:
-                data_file.write(format_string.format(
-                    organism.id, formula, organism.total_energy, organism.epa,
-                    num_calcs, progress))
+                data_file.write(
+                    format_string.format(
+                        organism.id,
+                        formula,
+                        organism.total_energy,
+                        organism.epa,
+                        num_calcs,
+                        progress,
+                    )
+                )
 
         # write genes_data file
         self.write_genes_file(organism)
@@ -1040,6 +1086,9 @@ class DataWriter(object):
         Args:
             organism: the Organism whose data to write
         """
-        with open(self.genes_file, 'a') as genes:
-            genes.write('{0}\t {1}\t {2}\n'.format(
-                            organism.id, organism.parents, organism.made_by))
+        with open(self.genes_file, "a") as genes:
+            genes.write(
+                "{0}\t {1}\t {2}\n".format(
+                    organism.id, organism.parents, organism.made_by
+                )
+            )

@@ -152,7 +152,6 @@ def main():
                 if new_organism is not None:  # loop above could return None
                     geometry.unpad(new_organism.cell, new_organism.n_sub,
                                                                 constraints)
-
                     if developer.develop(new_organism, composition_space,
                                          constraints, geometry, pool):
                         redundant_organism = redundancy_guard.check_redundancy(
@@ -190,10 +189,10 @@ def main():
                             n_whiles1 = 0
                             stopping_criteria.update_calc_counter()
                             index = len(threads)
+                        
                             thread = threading.Thread(
                                 target=energy_calculator.do_energy_calculation,
-                                args=[new_organism, relaxed_organisms,
-                                      index, composition_space],
+                                args=[new_organism, composition_space, relaxed_organisms, index],
                                 kwargs=kwargs)
                             thread.start()
                             threads.append(thread)

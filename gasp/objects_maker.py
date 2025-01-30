@@ -272,8 +272,8 @@ def make_objects(parameters):
     pool.comp_fitness_weight = comp_fitness_weight
     objects_dict['pool'] = pool
 
-    job_specs = {}
-    if 'JobSpecs' in parameters:
+    if 'JobSpecs' in parameters:  # TODO: Rename to 'ClusterSpecs'
+        job_specs = {}
         job_specs = parameters['JobSpecs']
 
         if 'cores' in job_specs:
@@ -305,7 +305,7 @@ def make_objects(parameters):
             print ('Using default interface \'ib0\' (infiniband nodes)')
             job_specs['interface'] = 'ib0'
 
-    objects_dict['job_specs'] = job_specs
+        objects_dict['job_specs'] = job_specs
 
     return objects_dict
 
