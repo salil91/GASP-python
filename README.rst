@@ -1,4 +1,4 @@
-GASP is a genetic algorithm for structure and phase prediction written in Python and interfaced to GULP_, LAMMPS_ and VASP_. It can search for the structures of clusters, 2D materials, wires, and bulk materials and do both fixed-composition and phase diagram searches.
+maGASP is a genetic algorithm for structure and phase prediction written in Python and interfaced to GULP_, LAMMPS_ and VASP_. It can search for the structures of clusters, 2D materials, wires, and bulk materials and do both fixed-composition and phase diagram searches.
 
 .. _VASP: http://www.vasp.at/
 .. _LAMMPS: http://lammps.sandia.gov/
@@ -53,7 +53,7 @@ After completing the installation, create a new terminal in order for the enviro
 
 To create a new conda environment named 'my_gasp', type::
 
-    conda create --name my_gasp python=3.7
+    conda create --name my_gasp
 
 When conda asks you::
 
@@ -79,13 +79,9 @@ pymatgen requires using the gcc compiler. To do so, type::
 
 Install pymatgen, which also installs other required dependencies - numpy, scipy, matplotlib
 
-*Note: The latest versions of pymatgen break parts of the GASP code. Until this is fixed, pin pymatgen to v2020*::
+*Note: The latest versions of pymatgen break parts of the GASP code. Until this is fixed, pin pymatgen (and some other packages) to v2020*::
 
-    conda install -c conda-forge pymatgen=2020
-
-Install dask and dask_jobqueue::
-
-    conda install -c conda-forge dask dask-jobqueue
+    conda install -c conda-forge python=3.7 "numpy<1.20" pymatgen=2020 pyyaml=6 ruamel.yaml=0.16 dask dask-jobqueue
 
 When searching for clusters and wires, GASP uses features of pymatgen that depend on openbabel. So if you plan to use GASP to search for clusters or wires, install openbabel in your conda environment (recommended)::
 
