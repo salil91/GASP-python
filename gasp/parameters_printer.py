@@ -333,7 +333,7 @@ def print_parameters(objects_dict, lat_match_dict=None):
 
         # write the job_specs of the dask-worker including defaults (if any)
         if use_dask:
-            parameters_file.write('job_specs: \n')
+            parameters_file.write('JobSpecs: \n')
             parameters_file.write('    cores: ' + str(job_specs['cores']) + '\n')
             parameters_file.write('    memory: ' + job_specs['memory'] + '\n')
             parameters_file.write('    project: ' + job_specs['project'] + '\n')
