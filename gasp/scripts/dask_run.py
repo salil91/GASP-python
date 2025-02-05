@@ -145,7 +145,7 @@ def main():
                                 queue=job_specs['queue'],
                                 interface=job_specs['interface'],
                                 walltime=job_specs['walltime'],
-                                job_extra=job_specs['job_extra'])
+                                job_extra=job_specs['job_extra_directives'])
         cluster_job.scale(num_calcs_at_once)  # number of parallel jobs
         client  = Client(cluster_job)
     else:
