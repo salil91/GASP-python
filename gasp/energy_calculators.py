@@ -179,14 +179,14 @@ class VaspEnergyCalculator(object):
                 if ind > 1:
                     self.rearrange_files(ind, job_dir_path)
                 with open(job_dir_path / "vasp.out", "w") as fout:
-                with open(job_dir_path / "vasp.err", "w") as ferr:
-                    try:
-                        subprocess.call(
-                            ["callvasp", job_dir_path], stdout=fout, stderr=ferr
-                        )
-                    except:
-                        print("Error running VASP on organism {} ".format(organism.id))
-                        return None
+                    with open(job_dir_path / "vasp.err", "w") as ferr:
+                        try:
+                            subprocess.call(
+                                ["callvasp", job_dir_path], stdout=fout, stderr=ferr
+                            )
+                        except:
+                            print("Error running VASP on organism {} ".format(organism.id))
+                            return None
 
         # check if converged again (useful when
         # self.num_submits_to_converge = 0)
