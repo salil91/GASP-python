@@ -148,14 +148,15 @@ class VaspEnergyCalculator(object):
         # run 'callvasp' script as a subprocess to run VASP
         print("Starting VASP calculation on organism {} ".format(organism.id))
         for i in range(self.num_submits_to_converge):
-            devnull = open(os.devnull, "w")
-            try:
-                subprocess.call(
-                    ["callvasp", job_dir_path], stdout=devnull, stderr=devnull
-                )
-            except:
-                print("Error running VASP on organism {} ".format(organism.id))
-                return None
+            with open(job_dir_path / "vasp.out", "w") as fout:
+                with open(job_dir_path / "vasp.err", "w") as ferr:
+                    try:
+                        subprocess.call(
+                            ["callvasp", job_dir_path], stdout=fout, stderr=ferr
+                        )
+                    except:
+                        print("Error running VASP on organism {} ".format(organism.id))
+                        return None
 
             # check if the VASP calculation converged
             converged = False
@@ -177,14 +178,15 @@ class VaspEnergyCalculator(object):
                 ind = self.num_submits_to_converge + i + 1
                 if ind > 1:
                     self.rearrange_files(ind, job_dir_path)
-                devnull = open(os.devnull, "w")
-                try:
-                    subprocess.call(
-                        ["callvasp", job_dir_path], stdout=devnull, stderr=devnull
-                    )
-                except:
-                    print("Error running VASP on organism {} ".format(organism.id))
-                    return None
+                with open(job_dir_path / "vasp.out", "w") as fout:
+                with open(job_dir_path / "vasp.err", "w") as ferr:
+                    try:
+                        subprocess.call(
+                            ["callvasp", job_dir_path], stdout=fout, stderr=ferr
+                        )
+                    except:
+                        print("Error running VASP on organism {} ".format(organism.id))
+                        return None
 
         # check if converged again (useful when
         # self.num_submits_to_converge = 0)
