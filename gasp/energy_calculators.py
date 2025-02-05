@@ -109,7 +109,7 @@ class VaspEnergyCalculator(object):
 
         TODO: maybe use the custodian package for error handling
         """
-
+        
         # make the job directory
         job_dir_path = str(os.getcwd()) + "/temp/" + str(organism.id)
         os.mkdir(job_dir_path)
@@ -148,8 +148,8 @@ class VaspEnergyCalculator(object):
         # run 'callvasp' script as a subprocess to run VASP
         print("Starting VASP calculation on organism {} ".format(organism.id))
         for i in range(self.num_submits_to_converge):
-            with open(job_dir_path / "vasp.out", "w") as fout:
-                with open(job_dir_path / "vasp.err", "w") as ferr:
+            with open(job_dir_path + "/vasp.out", "w") as fout:
+                with open(job_dir_path + "/vasp.err", "w") as ferr:
                     try:
                         subprocess.call(
                             ["callvasp", job_dir_path], stdout=fout, stderr=ferr
@@ -177,8 +177,8 @@ class VaspEnergyCalculator(object):
                 ind = self.num_submits_to_converge + i + 1
                 if ind > 1:
                     self.rearrange_files(ind, job_dir_path)
-                with open(job_dir_path / "vasp.out", "w") as fout:
-                    with open(job_dir_path / "vasp.err", "w") as ferr:
+                with open(job_dir_path + "/vasp.out", "w") as fout:
+                    with open(job_dir_path + "/vasp.err", "w") as ferr:
                         try:
                             subprocess.call(
                                 ["callvasp", job_dir_path], stdout=fout, stderr=ferr
