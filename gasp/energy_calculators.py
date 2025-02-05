@@ -154,9 +154,8 @@ class VaspEnergyCalculator(object):
                         subprocess.call(
                             ["callvasp", job_dir_path], stdout=fout, stderr=ferr
                         )
-                    except:
-                        print("Error running VASP on organism {} ".format(organism.id))
-                        return None
+                    except Exception as e:
+                        print("Error running VASP on organism {}: {} ".format(organism.id, e))
 
             # check if the VASP calculation converged
             converged = False
@@ -184,8 +183,8 @@ class VaspEnergyCalculator(object):
                             subprocess.call(
                                 ["callvasp", job_dir_path], stdout=fout, stderr=ferr
                             )
-                        except:
-                            print("Error running VASP on organism {} ".format(organism.id))
+                        except Exception as e:
+                            print("Error running VASP on organism {}: {} ".format(organism.id, e))
                             return None
 
         # check if converged again (useful when
