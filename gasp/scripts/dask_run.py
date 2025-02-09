@@ -148,6 +148,11 @@ def main():
                                 job_extra=job_specs['job_extra_directives'])
         cluster_job.scale(num_calcs_at_once)  # number of parallel jobs
         client  = Client(cluster_job)
+        print("\nCluster Job:")
+        print(cluster_job)
+        print("\nClient:")
+        print(client)
+        print("\n")
     else:
         # Python multiprocessing
         from concurrent.futures import ProcessPoolExecutor

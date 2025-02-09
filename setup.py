@@ -20,7 +20,7 @@ if __name__ == "__main__":
         packages=find_packages(),
         package_data={},
         zip_safe=False,
-        install_requires=['python=3.8', 'pymatgen<=2020', 'numpy<1.20', 'pyyaml=6', 'ruamel.yaml=0.16', 'dask', 'dask-jobqueue'],
+        install_requires=[],
         classifiers=['Programming Language :: Python :: 2.7',
                      "Programming Language :: Python :: 3",
                      "Programming Language :: Python :: 3.8",
