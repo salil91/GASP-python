@@ -63,19 +63,10 @@ Type 'y' and press Enter.
 
 Now activate the environment so that packages can be installed into it::
 
-    # if Mac or Linux
-    source activate my_gasp
-
-    # if Windows
-    activate my_gasp
-
+    conda activate my_gasp
 
 3. Install pymatgen and its dependencies
 ----------------------------------------
-
-pymatgen requires using the gcc compiler. To do so, type::
-
-    export CC=gcc
 
 Install pymatgen, which also installs other required dependencies - numpy, scipy, matplotlib
 
