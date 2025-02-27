@@ -33,18 +33,6 @@ which shows all conda environments (if conda is loaded successfully).
 
 If conda command not found, download and install the latest version of conda for your operating system from http://conda.pydata.org/miniconda.html. Although GASP is compatible with both Python 2.7 and 3.7, pymatgen recommends using Python >=3.7.
 
-For Windows, make sure you have the Miniconda3 installer, and simply double-click the .exe file.
-
-For Mac or Linux, run the bash script::
-
-    # if Mac
-    bash Miniconda3-latest-MacOSX-x86_64.sh
-
-    # if Linux
-    bash Miniconda3-latest-Linux-x86_64.sh
-
-The installer will ask you to approve the terms of the license and then tell you where the installation will be located. The default location is fine, so press Enter. Finally, the installer will ask if you would like it to add the install location to your PATH by prepending a line to your .bash_profile (for Mac) or .bashrc (for Linux) file. Type 'yes' and press Enter.
-
 After completing the installation, create a new terminal in order for the environment variables added by conda to be loaded.
 
 
